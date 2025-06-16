@@ -1,6 +1,7 @@
 #include <QSet>
 #include <QHBoxLayout>
 #include <QWidget>
+#include <QGroupBox>
 #include "api_types.h"
 #include "QMainWindow"
 
@@ -14,12 +15,17 @@ public:
 
     static bool getIsPlanetDisplayed(int planetIndex);
     static bool setIsPlanetDisplayed(int planetIndex);
+    static void clearPlanetsDisplayed();
+    static void clearAPlanetDisplayed(int planetIndex);
+
     static bool getIsWarDisplayed();
     static void setIsWarDisplayed();
     static bool getCurrentLayoutForm();
     static void setCurrentLayoutForm(int choice);
 
+
     void addPlanetToCurrentLayout(API_Types::warCampaignStructT planet);
+    void clearPlanetLayout();
     void addWarToCurrentLayout(API_Types::warInfoStructT war);
 
     enum CurrentLayoutForm
@@ -29,13 +35,15 @@ public:
     };
     static CurrentLayoutForm layoutForm;
 
-    void setLayout();
+    void setPlanetLayout();
 
 private:
     static QSet<int> planetsCurrentlyDisplayed;
     static bool isWarDisplayed;
+
     QWidget *window = new QWidget;
     QHBoxLayout *planetsLayout = new QHBoxLayout(window);
+    QVector<QGroupBox*> *planetsInLayout = new QVector<QGroupBox*>();
     QMainWindow *myMainWindow;
 };
 

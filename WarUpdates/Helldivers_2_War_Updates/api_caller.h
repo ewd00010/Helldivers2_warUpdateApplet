@@ -7,7 +7,7 @@
 class API_Caller
 {
 public:
-    API_Caller(DisplayInfoHandler DIH);
+    API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH);
 
     void useWarCampaignInfo();
     void useWarInfoInfo();
@@ -17,7 +17,7 @@ private:
     QList<API_Types::warInfoStructT> retrieveWarInfo();
     void retrieveWarStatus();
     void retrieveMajorOrder();
-    DisplayInfoHandler myDIH;
+    std::shared_ptr<DisplayInfoHandler> myDIH;
 };
 
 #endif // API_CALLER_H

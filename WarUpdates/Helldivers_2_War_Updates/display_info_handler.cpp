@@ -26,6 +26,7 @@ bool DisplayInfoHandler::setIsPlanetDisplayed(int planetIndex)
     }
     return false;
 };
+
 void DisplayInfoHandler::addWarToCurrentLayout(API_Types::warInfoStructT war){};
 
 void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT planet)
@@ -79,11 +80,11 @@ void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT 
 
         planetGroupBox->setLayout(mainLayout);
         planetsLayout->addWidget(planetGroupBox);
-        qDebug() << "made it";
+        planetsInLayout->append(planetGroupBox);
     }
 };
 
-void DisplayInfoHandler::setLayout()
+void DisplayInfoHandler::setPlanetLayout()
 {
     window->setLayout(planetsLayout);
     myMainWindow->setCentralWidget(window);
@@ -115,4 +116,19 @@ void DisplayInfoHandler::setCurrentLayoutForm(int choice)
         DisplayInfoHandler::layoutForm = DisplayInfoHandler::CurrentLayoutForm::automaticallySet;
         break;
     }
+};
+
+void DisplayInfoHandler::clearPlanetsDisplayed()
+{
+    planetsCurrentlyDisplayed.clear();
+};
+
+void DisplayInfoHandler::clearPlanetLayout()
+{
+    foreach(QGroupBox *planet, *planetsInLayout)
+    {
+        planetsLayout->removeWidget(planet);
+    }
+    window->setLayout(planetsLayout);
+    myMainWindow->setCentralWidget(window);
 };
