@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-b43dbc595695c1378183.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Helldivers_2_War_Updates",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Helldivers_2_War_Updates::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Helldivers_2_War_Updates-Debug-117a8edb8154bd91d985.json",
+					"name" : "Helldivers_2_War_Updates",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Helldivers_2_War_Updates_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Helldivers_2_War_Updates_autogen-Debug-cecbb3f8852a2ef7a4b2.json",
+					"name" : "Helldivers_2_War_Updates_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Helldivers_2_War_Updates_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Helldivers_2_War_Updates_autogen_timestamp_deps-Debug-1861ab89ac19744ed0c7.json",
+					"name" : "Helldivers_2_War_Updates_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/ewan/Documents/MyApps/Helldivers2/WarUpdates/Helldivers_2_War_Updates/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug",
+		"source" : "C:/Users/ewan/Documents/MyApps/Helldivers2/WarUpdates/Helldivers_2_War_Updates"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
