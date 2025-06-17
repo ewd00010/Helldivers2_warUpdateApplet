@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr, std::shared_ptr<DisplayInfoHandler> *DIH = nullptr, std::shared_ptr<API_Caller> *apiCaller = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     std::shared_ptr<DisplayInfoHandler> myDIH;
     std::shared_ptr<API_Caller> myApiCaller;

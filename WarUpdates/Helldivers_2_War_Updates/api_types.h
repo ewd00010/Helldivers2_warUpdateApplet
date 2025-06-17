@@ -63,6 +63,11 @@ public:
         QString taskDescription;
         int planetIds[];
     } majorOrderStruct;
+
+    enum typeOfCheck
+    {
+        Campaign = 0
+    };
 };
 
 #endif // API_TYPES_H

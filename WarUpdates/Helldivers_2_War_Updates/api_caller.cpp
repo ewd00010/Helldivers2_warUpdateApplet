@@ -23,15 +23,17 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
 
     QObject::connect(
         reply, &QNetworkReply::finished,
-        [&myConnectFinished, reply, warCampaignVectorPtr]() {
+        [&myConnectFinished, reply, warCampaignVectorPtr, this]() {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray responseData = reply->readAll();
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
                 QJsonArray jsonArray = jsonDoc.array();
 
                 foreach (const QJsonValue &planet, jsonArray) {
-                    const QJsonObject planetObj = planet.toObject();
-
+                    QJsonObject planetObj = planet.toObject();
+                    const QJsonObject planetObjChecked = API_Caller::errorCheck(planetObj, API_Types::typeOfCheck::Campaign);
+                    // NOTE FOR NEXT DAY: convert the errorCheck code to be structGenerator,
+                    //assigning values after no error catched
                     API_Types::warCampaignStructT warCampaignStruct(
                         planetObj.find("planetIndex")->toInt(),
                         planetObj.find("name")->toString(),
@@ -44,12 +46,13 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
                         planetObj.find("majorOrder")->toBool(),
                         planetObj.find("biome")->toObject().find("slug")->toString());
 
-                    warCampaignVectorPtr.get()->append(warCampaignStruct);
+                    warCampaignVectorPtr->append(warCampaignStruct);
                 }
             } else {
                 qDebug() << "Error:" << reply->errorString();
             }
             reply->deleteLater();
+            qDebug() << "made it";
             myConnectFinished.quit();
         });
     myConnectFinished.exec();
@@ -119,3 +122,102 @@ void API_Caller::useWarInfoInfo() {
 
 void API_Caller::retrieveWarStatus() {};
 void API_Caller::retrieveMajorOrder() {};
+
+QJsonObject errorCheck(QJsonObject *info, int type)
+{
+    switch(type)
+    {
+    case API_Types::typeOfCheck::Campaign:
+        try
+        {
+            info->find("planetIndex")->toInt();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("planetIndex");
+        }
+
+        try
+        {
+            info->find("name")->toString();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("name");
+        }
+
+        try
+        {
+            info->find("faction")->toString();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("faction");
+        }
+
+        try
+        {
+            info->find("players")->toInt();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("players");
+        }
+
+        try
+        {
+            info->find("health")->toInt();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("health");
+        }
+
+        try
+        {
+            info->find("maxHealth")->toInt();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("maxHealth");
+        }
+
+        try
+        {
+            info->find("percentage")->toDouble();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("percentage");
+        }
+
+        try
+        {
+            info->find("defense")->toBool();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("defense");
+        }
+
+        try
+        {
+            info->find("majorOrder")->toBool();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("majorOrder");
+        }
+
+        try
+        {
+            info->find("biome")->toObject().find("slug")->toString();
+        }
+        catch(std::exception ex)
+        {
+            info->remove("biome");
+        }
+        break;
+    };
+    return info;
+};

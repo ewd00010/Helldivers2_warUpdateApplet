@@ -11,6 +11,7 @@ public:
 
     void useWarCampaignInfo();
     void useWarInfoInfo();
+    QJsonObject errorCheck(QJsonObject info, int type);
 
 private:
     QList<API_Types::warCampaignStructT> retrieveWarCampaign();
