@@ -6,7 +6,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <qforeach.h>
 #include <QEventLoop>
 
 API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH) : myDIH(*DIH) {}
@@ -16,37 +15,24 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
     QNetworkReply *reply = netManager->get(QNetworkRequest(
         QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign")));
     QList<API_Types::warCampaignStructT> warCampaignList;
-    auto warCampaignVectorPtr =
+    auto warCampaignListPtr =
         std::make_shared<QList<API_Types::warCampaignStructT>>(warCampaignList);
 
     QEventLoop myConnectFinished;
 
     QObject::connect(
         reply, &QNetworkReply::finished,
-        [&myConnectFinished, reply, warCampaignVectorPtr, this]() {
+        [&myConnectFinished, reply, &warCampaignListPtr, this]() {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray responseData = reply->readAll();
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
                 QJsonArray jsonArray = jsonDoc.array();
 
-                foreach (const QJsonValue &planet, jsonArray) {
+                for(const QJsonValue &planet : jsonArray) {
                     QJsonObject planetObj = planet.toObject();
-                    const QJsonObject planetObjChecked = API_Caller::errorCheck(planetObj, API_Types::typeOfCheck::Campaign);
-                    // NOTE FOR NEXT DAY: convert the errorCheck code to be structGenerator,
-                    //assigning values after no error catched
-                    API_Types::warCampaignStructT warCampaignStruct(
-                        planetObj.find("planetIndex")->toInt(),
-                        planetObj.find("name")->toString(),
-                        planetObj.find("faction")->toString(),
-                        planetObj.find("players")->toInt(),
-                        planetObj.find("health")->toInt(),
-                        planetObj.find("maxHealth")->toInt(),
-                        planetObj.find("percentage")->toDouble(),
-                        planetObj.find("defense")->toBool(),
-                        planetObj.find("majorOrder")->toBool(),
-                        planetObj.find("biome")->toObject().find("slug")->toString());
+                    const API_Types::warCampaignStructT warCampaignStruct = errorCheck(planetObj, API_Types::typeOfCheck::Campaign);
 
-                    warCampaignVectorPtr->append(warCampaignStruct);
+                    warCampaignListPtr->append(warCampaignStruct);
                 }
             } else {
                 qDebug() << "Error:" << reply->errorString();
@@ -56,14 +42,14 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
             myConnectFinished.quit();
         });
     myConnectFinished.exec();
-    return *warCampaignVectorPtr.get();
+    return *warCampaignListPtr.get();
 };
 
 void API_Caller::useWarCampaignInfo() {
     QList<API_Types::warCampaignStructT> campaignInfo =
         API_Caller::retrieveWarCampaign();
 
-    foreach (const API_Types::warCampaignStructT planet, campaignInfo)
+    for (const API_Types::warCampaignStructT planet : campaignInfo)
         if (!DisplayInfoHandler::getIsPlanetDisplayed(planet.myPlanetIndex)) {
             {
                 myDIH->addPlanetToCurrentLayout(planet);
@@ -83,28 +69,28 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
     QEventLoop myConnectFinished;
     QObject::connect(reply, &QNetworkReply::finished,
                      [&myConnectFinished, reply, warInfoListPtr]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray responseData = reply->readAll();
-            QJsonDocument jsonDoc =
-                QJsonDocument::fromJson(responseData);
-            QJsonArray jsonArray = jsonDoc.array();
+                         if (reply->error() == QNetworkReply::NoError) {
+                             QByteArray responseData = reply->readAll();
+                             QJsonDocument jsonDoc =
+                                 QJsonDocument::fromJson(responseData);
+                             QJsonArray jsonArray = jsonDoc.array();
 
-            foreach (const QJsonValue &war, jsonArray) {
-                const QJsonObject warObj = war.toObject();
+                             for (const QJsonValue &war : jsonArray) {
+                                 const QJsonObject warObj = war.toObject();
 
-                API_Types::warInfoStructT warInfoStruct(
-                    warObj.find("warId")->toInt(),
-                    warObj.find("startDate")->toInt(),
-                    warObj.find("endDate")->toInt());
+                                 API_Types::warInfoStructT warInfoStruct(
+                                     warObj.find("warId")->toInt(),
+                                     warObj.find("startDate")->toInt(),
+                                     warObj.find("endDate")->toInt());
 
-                warInfoListPtr.get()->append(warInfoStruct);
-            }
-        } else {
-            qDebug() << "Error:" << reply->errorString();
-        }
-        reply->deleteLater();
-        myConnectFinished.quit();
-    });
+                                 warInfoListPtr.get()->append(warInfoStruct);
+                             }
+                         } else {
+                             qDebug() << "Error:" << reply->errorString();
+                         }
+                         reply->deleteLater();
+                         myConnectFinished.quit();
+                     });
     myConnectFinished.exec();
     return *warInfoListPtr.get();
 };
@@ -112,7 +98,7 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
 void API_Caller::useWarInfoInfo() {
     QList<API_Types::warInfoStructT> warInfoInfo = API_Caller::retrieveWarInfo();
 
-    foreach (const API_Types::warInfoStructT war, warInfoInfo) {
+    for(const API_Types::warInfoStructT war : warInfoInfo) {
         if (!DisplayInfoHandler::getIsWarDisplayed()) {
             myDIH->addWarToCurrentLayout(war);
         }
@@ -123,101 +109,76 @@ void API_Caller::useWarInfoInfo() {
 void API_Caller::retrieveWarStatus() {};
 void API_Caller::retrieveMajorOrder() {};
 
-QJsonObject errorCheck(QJsonObject *info, int type)
+API_Types::warCampaignStructT API_Caller::errorCheck(QJsonObject &info, API_Types::typeOfCheck type)
 {
+    API_Types::warCampaignStructT warCampaignStruct = API_Types::warCampaignStructT();
+
     switch(type)
     {
     case API_Types::typeOfCheck::Campaign:
-        try
+        if (info.contains("planetIndex") && info["planetIndex"].isDouble())
+            warCampaignStruct.myPlanetIndex = info["planetIndex"].toInt();
+        else
+            qDebug() << "Missing or invalid planetIndex";
+
+        if (info.contains("name") && info["name"].isString())
+            warCampaignStruct.myPlanetName = info["name"].toString();
+        else
+            qDebug() << "Missing or invalid planet name";
+
+        if (info.contains("faction") && info["faction"].isString())
+            warCampaignStruct.myFactionName = info["faction"].toString();
+        else
+            qDebug() << "Missing or invalid faction name";
+
+        if (info.contains("players") && info["players"].isDouble())
+            warCampaignStruct.myPlayers = info["players"].toInt();
+        else
+            qDebug() << "Missing or invalid players";
+
+        if (info.contains("health") && info["health"].isDouble())
+            warCampaignStruct.myHealth = info["health"].toInt();
+        else
+            qDebug() << "Missing or invalid health";
+
+        if (info.contains("maxHealth") && info["maxHealth"].isDouble())
+            warCampaignStruct.myMaxHealth = info["maxHealth"].toInt();
+        else
+            qDebug() << "Missing or invalid maxHealth";
+
+        if (info.contains("percentage") && info["percentage"].isDouble())
+            warCampaignStruct.myPercentage = info["percentage"].toDouble();
+        else
+            qDebug() << "Missing or invalid percentage";
+
+        if (info.contains("defense") && info["defense"].isBool())
+            warCampaignStruct.myIsDefence = info["defense"].toBool();
+        else
+            qDebug() << "Missing or invalid defense";
+
+        if (info.contains("majorOrder") && info["majorOrder"].isBool())
+            warCampaignStruct.myIsMajorOrder = info["majorOrder"].toBool();
+        else if (info.contains("majorOrder") && info["majorOrder"].isDouble())
+            warCampaignStruct.myIsMajorOrder = info["majorOrder"].toInt();
+        else
         {
-            info->find("planetIndex")->toInt();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("planetIndex");
+            qDebug() << "Missing or invalid majorOrder";
         }
 
-        try
-        {
-            info->find("name")->toString();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("name");
-        }
-
-        try
-        {
-            info->find("faction")->toString();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("faction");
-        }
-
-        try
-        {
-            info->find("players")->toInt();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("players");
-        }
-
-        try
-        {
-            info->find("health")->toInt();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("health");
-        }
-
-        try
-        {
-            info->find("maxHealth")->toInt();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("maxHealth");
-        }
-
-        try
-        {
-            info->find("percentage")->toDouble();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("percentage");
-        }
-
-        try
-        {
-            info->find("defense")->toBool();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("defense");
-        }
-
-        try
-        {
-            info->find("majorOrder")->toBool();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("majorOrder");
-        }
-
-        try
-        {
-            info->find("biome")->toObject().find("slug")->toString();
-        }
-        catch(std::exception ex)
-        {
-            info->remove("biome");
+        if (info.contains("biome") && info["biome"].isObject()) {
+            QJsonObject biomeObj = info["biome"].toObject();
+            if (biomeObj.contains("slug") && biomeObj["slug"].isString())
+                warCampaignStruct.myBiome = biomeObj["slug"].toString();
+            else
+                qDebug() << "Missing or invalid biome.slug";
+        } else {
+            qDebug() << "Missing or invalid biome object";
         }
         break;
-    };
-    return info;
+    default:
+        qDebug() << "failed to find type in switch case";
+        break;
+    }
+
+    return warCampaignStruct;
 };

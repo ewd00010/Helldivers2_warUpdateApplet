@@ -1,4 +1,5 @@
 #include <QString>
+#include <QDebug>
 
 #ifndef API_TYPES_H
 #define API_TYPES_H
@@ -9,17 +10,6 @@ class API_Types
 public:
     struct warCampaignStructT
     {
-        warCampaignStructT(int planetIndex,
-                           QString planetName,
-                           QString factionName,
-                           int players,
-                           int health,
-                           int maxHealth,
-                           double percentage,
-                           bool isDefence,
-                           bool isMajorOrder,
-                           QString biome) : myPlanetIndex(planetIndex), myPlanetName(planetName), myFactionName(factionName), myPlayers(players), myHealth(health),
-            myMaxHealth(maxHealth), myPercentage(percentage), myIsDefence(isDefence), myIsMajorOrder(isMajorOrder), myBiome(biome) {}
         int myPlanetIndex;
         QString myPlanetName;
         QString myFactionName;

@@ -125,10 +125,15 @@ void DisplayInfoHandler::clearPlanetsDisplayed()
 
 void DisplayInfoHandler::clearPlanetLayout()
 {
-    foreach(QGroupBox *planet, *planetsInLayout)
+    qDebug() << "called clearPlanetLayout";
+
+    for(QGroupBox *planet : *planetsInLayout)
     {
         planetsLayout->removeWidget(planet);
+        planet->hide();
+        planet->deleteLater();
     }
+
     window->setLayout(planetsLayout);
     myMainWindow->setCentralWidget(window);
 };
