@@ -3,6 +3,10 @@
 #include <QProgressBar>
 #include <QGroupBox>
 #include <QVBoxLayout>
+#include "api_caller.h"
+
+
+DisplayInfoHandler::DisplayInfoHandler(QMainWindow *mainWindow) : myMainWindow(mainWindow) {}
 
 QSet<int> DisplayInfoHandler::planetsCurrentlyDisplayed;
 
@@ -10,31 +14,29 @@ bool DisplayInfoHandler::isWarDisplayed;
 
 DisplayInfoHandler::CurrentLayoutForm DisplayInfoHandler::layoutForm;
 
-DisplayInfoHandler::DisplayInfoHandler(QMainWindow *mainWindow) : myMainWindow(mainWindow) {}
-
-bool DisplayInfoHandler::getIsPlanetDisplayed(int planetIndex)
+bool DisplayInfoHandler::getIsPlanetDisplayed(const int& planetIndex)
 {
-    return DisplayInfoHandler::planetsCurrentlyDisplayed.contains(planetIndex);
+    return planetsCurrentlyDisplayed.contains(planetIndex);
 };
 
-bool DisplayInfoHandler::setIsPlanetDisplayed(int planetIndex)
+bool DisplayInfoHandler::setIsPlanetDisplayed(const int& planetIndex)
 {
-    if(!DisplayInfoHandler::planetsCurrentlyDisplayed.contains(planetIndex))
+    if(!planetsCurrentlyDisplayed.contains(planetIndex))
     {
-        DisplayInfoHandler::planetsCurrentlyDisplayed.insert(planetIndex);
+        planetsCurrentlyDisplayed.insert(planetIndex);
         return true;
     }
     return false;
 };
 
-void DisplayInfoHandler::addWarToCurrentLayout(API_Types::warInfoStructT war){};
+void DisplayInfoHandler::addWarToCurrentLayout(API_Types::warInfoStructT& war){};
 
-void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT planet)
+void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet)
 {
     if(!getIsPlanetDisplayed(planet.myPlanetIndex))
     {
         setIsPlanetDisplayed(planet.myPlanetIndex);
-        QGroupBox* planetGroupBox = new QGroupBox(planet.myPlanetName, DisplayInfoHandler::window);
+        QGroupBox* planetGroupBox = new QGroupBox(planet.myPlanetName, window);
         planetGroupBox->setGeometry(40, 50, 241, 481);
 
         // Create layout for labels
@@ -92,28 +94,28 @@ void DisplayInfoHandler::setPlanetLayout()
 
 bool DisplayInfoHandler::getIsWarDisplayed()
 {
-    return DisplayInfoHandler::isWarDisplayed;
+    return isWarDisplayed;
 };
 
 void DisplayInfoHandler::setIsWarDisplayed()
 {
-    DisplayInfoHandler::isWarDisplayed = !DisplayInfoHandler::isWarDisplayed;
+    isWarDisplayed = !isWarDisplayed;
 }
 
 bool DisplayInfoHandler::getCurrentLayoutForm()
 {
-    return DisplayInfoHandler::layoutForm;
+    return layoutForm;
 };
 
-void DisplayInfoHandler::setCurrentLayoutForm(int choice)
+void DisplayInfoHandler::setCurrentLayoutForm(const int& choice)
 {
     switch(choice)
     {
     case 0:
-        DisplayInfoHandler::layoutForm = DisplayInfoHandler::CurrentLayoutForm::manuallySet;
+        layoutForm = CurrentLayoutForm::manuallySet;
         break;
     case 1:
-        DisplayInfoHandler::layoutForm = DisplayInfoHandler::CurrentLayoutForm::automaticallySet;
+        layoutForm = CurrentLayoutForm::automaticallySet;
         break;
     }
 };
@@ -125,14 +127,14 @@ void DisplayInfoHandler::clearPlanetsDisplayed()
 
 void DisplayInfoHandler::clearPlanetLayout()
 {
-    qDebug() << "called clearPlanetLayout";
+    qDebug() << "DisplayInfoHandler::clearPlanetLayout";
 
     for(QGroupBox *planet : *planetsInLayout)
     {
         planetsLayout->removeWidget(planet);
-        planet->hide();
-        planet->deleteLater();
+        delete planet;
     }
+    planetsInLayout->clear();
 
     window->setLayout(planetsLayout);
     myMainWindow->setCentralWidget(window);

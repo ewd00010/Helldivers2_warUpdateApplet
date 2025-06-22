@@ -46,10 +46,11 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
 };
 
 void API_Caller::useWarCampaignInfo() {
+    qDebug() << "ApiCaller::useWarCampaignInfo";
     QList<API_Types::warCampaignStructT> campaignInfo =
-        API_Caller::retrieveWarCampaign();
+        retrieveWarCampaign();
 
-    for (const API_Types::warCampaignStructT planet : campaignInfo)
+    for (API_Types::warCampaignStructT planet : campaignInfo)
         if (!DisplayInfoHandler::getIsPlanetDisplayed(planet.myPlanetIndex)) {
             {
                 myDIH->addPlanetToCurrentLayout(planet);
@@ -96,9 +97,9 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
 };
 
 void API_Caller::useWarInfoInfo() {
-    QList<API_Types::warInfoStructT> warInfoInfo = API_Caller::retrieveWarInfo();
+    QList<API_Types::warInfoStructT> warInfoInfo = retrieveWarInfo();
 
-    for(const API_Types::warInfoStructT war : warInfoInfo) {
+    for(API_Types::warInfoStructT& war : warInfoInfo) {
         if (!DisplayInfoHandler::getIsWarDisplayed()) {
             myDIH->addWarToCurrentLayout(war);
         }

@@ -8,12 +8,16 @@ class API_Caller
 {
 public:
     API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH);
+    virtual ~API_Caller() = default;
 
+    /*
+     * @brief
+     */
     void useWarCampaignInfo();
     void useWarInfoInfo();
     API_Types::warCampaignStructT errorCheck(QJsonObject &info, API_Types::typeOfCheck type);
-
 private:
+
     QList<API_Types::warCampaignStructT> retrieveWarCampaign();
     QList<API_Types::warInfoStructT> retrieveWarInfo();
     void retrieveWarStatus();

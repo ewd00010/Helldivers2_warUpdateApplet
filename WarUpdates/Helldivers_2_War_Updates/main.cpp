@@ -8,16 +8,14 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    qDebug() << "made it past main window";
+    qDebug() << "main window";
     w.myDIH = std::make_shared<DisplayInfoHandler>(&w);
 
-    qDebug() << "made it past DIH shared";
-    w.myDIH.get()->layoutForm = DisplayInfoHandler::CurrentLayoutForm::automaticallySet;
-    w.myApiCaller = std::make_shared<API_Caller>(&w.myDIH);
-    qDebug() << "made it past ApiCaller shared";
+    qDebug() << "DIH shared";
+    w.myDIH.get()->layoutForm = DisplayInfoHandler::CurrentLayoutForm::manuallySet;
 
-    w.myApiCaller->useWarCampaignInfo();
-    qDebug() << "made it past warCampaignInfo";
+    w.myApiCaller = std::make_shared<API_Caller>(&w.myDIH);
+    qDebug() << "ApiCaller shared";
 
     w.show();
     return a.exec();

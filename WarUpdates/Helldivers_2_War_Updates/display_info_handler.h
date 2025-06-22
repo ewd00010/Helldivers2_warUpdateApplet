@@ -8,25 +8,83 @@
 #ifndef DISPLAY_INFO_HANDLER_H
 #define DISPLAY_INFO_HANDLER_H
 
+/**
+ * @class DisplayInfoHandler
+ * @brief Manages what is displayed.
+ *
+ * @details
+ * this class contains information to what is currently display on screen; It
+ * allows for getting and setting of indivudal planets and wars, append them
+ * to the current layout and keeping a log of what is displayed. It also allows
+ * for clearing of the current layout.
+ *
+ */
 class DisplayInfoHandler
 {
 public:
     DisplayInfoHandler(QMainWindow *window);
 
-    static bool getIsPlanetDisplayed(int planetIndex);
-    static bool setIsPlanetDisplayed(int planetIndex);
+    /**
+    * @brief returns if the planet passed in is displayed
+    *
+    * @param planetIndex[in] the planet to check for
+    *
+    * @return if the planet is displayed
+    */
+    static bool getIsPlanetDisplayed(const int& planetIndex);
+
+    /**
+    * @brief sets the planet passed in to be displayed
+    *
+    * @param planetIndex[in] the planet to set as displayed
+    *
+    * @return true if it is now being displayed, false if it is already displayed
+    */
+    static bool setIsPlanetDisplayed(const int& planetIndex);
+
+    /**
+    * @brief clear ALL planets from the current list of displayed planet ids
+    */
     static void clearPlanetsDisplayed();
-    static void clearAPlanetDisplayed(int planetIndex);
 
+    /**
+    * @brief clear A planet from the current list of displayed planet ids
+    *
+    * @param planetIndex[in] the planet to check for
+    *
+    * @return true if it is removed from the id list, false if it was not in the list
+    */
+    static bool clearAPlanetDisplayed(const int& planetIndex);
+
+    /**
+    * @brief checks if we are displaying war information
+    *
+    * @return true if the war is displayed currently
+    */
     static bool getIsWarDisplayed();
+
+    /**
+    * @brief sets tracker for if war info is currently being displayed
+    */
     static void setIsWarDisplayed();
+
+    /**
+    * @brief get the current layout form
+    *
+    * @return the layourform we are currently under
+    */
     static bool getCurrentLayoutForm();
-    static void setCurrentLayoutForm(int choice);
 
+    /**
+    * @brief set the current layout form
+    *
+    * @param the layout form we want to use
+    */
+    static void setCurrentLayoutForm(const int& choice);
 
-    void addPlanetToCurrentLayout(API_Types::warCampaignStructT planet);
+    void addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet);
     void clearPlanetLayout();
-    void addWarToCurrentLayout(API_Types::warInfoStructT war);
+    void addWarToCurrentLayout(API_Types::warInfoStructT& war);
 
     enum CurrentLayoutForm
     {

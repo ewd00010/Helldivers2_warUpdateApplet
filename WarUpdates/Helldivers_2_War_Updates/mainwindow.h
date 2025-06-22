@@ -24,7 +24,15 @@ public:
 private slots:
     void on_actionClear_all_planets_triggered();
 
+    void on_action_Automatically_add_triggered();
+
+    void on_action_Manually_add_triggered();
+
 private:
     Ui::MainWindow *ui;
+    inline static const int BASE_WIDTH = 700;
+    inline static const int BASE_HEIGHT = 500;
+    inline static const int MAX_WIDTH = 1920;
+    inline static const int MAX_HEIGHT = 1080;
 };
 #endif // MAINWINDOW_H
