@@ -11,7 +11,6 @@
 API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH) : myDIH(*DIH) {}
 
 QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
-    QNetworkAccessManager *netManager = new QNetworkAccessManager();
     QNetworkReply *reply = netManager->get(QNetworkRequest(
         QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign")));
     QList<API_Types::warCampaignStructT> warCampaignList;
@@ -30,7 +29,7 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
 
                 for(const QJsonValue &planet : jsonArray) {
                     QJsonObject planetObj = planet.toObject();
-                    const API_Types::warCampaignStructT warCampaignStruct = errorCheck(planetObj, API_Types::typeOfCheck::Campaign);
+                    API_Types::warCampaignStructT warCampaignStruct = std::get<API_Types::warCampaignStructT>(errorCheck(planetObj, API_Types::typeOfCheck::Campaign));
 
                     warCampaignListPtr->append(warCampaignStruct);
                 }
@@ -47,15 +46,16 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
 
 void API_Caller::useWarCampaignInfo() {
     qDebug() << "ApiCaller::useWarCampaignInfo";
-    QList<API_Types::warCampaignStructT> campaignInfo =
-        retrieveWarCampaign();
+    QList<API_Types::warCampaignStructT> campaignInfo = retrieveWarCampaign();
 
     for (API_Types::warCampaignStructT planet : campaignInfo)
+    {
         if (!DisplayInfoHandler::getIsPlanetDisplayed(planet.myPlanetIndex)) {
             {
                 myDIH->addPlanetToCurrentLayout(planet);
             }
         }
+    }
     myDIH->setPlanetLayout();
 }
 
@@ -69,7 +69,7 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
 
     QEventLoop myConnectFinished;
     QObject::connect(reply, &QNetworkReply::finished,
-                     [&myConnectFinished, reply, warInfoListPtr]() {
+                     [&myConnectFinished, reply, warInfoListPtr, this]() {
                          if (reply->error() == QNetworkReply::NoError) {
                              QByteArray responseData = reply->readAll();
                              QJsonDocument jsonDoc =
@@ -77,12 +77,9 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
                              QJsonArray jsonArray = jsonDoc.array();
 
                              for (const QJsonValue &war : jsonArray) {
-                                 const QJsonObject warObj = war.toObject();
+                                QJsonObject warObj = war.toObject();
 
-                                 API_Types::warInfoStructT warInfoStruct(
-                                     warObj.find("warId")->toInt(),
-                                     warObj.find("startDate")->toInt(),
-                                     warObj.find("endDate")->toInt());
+                                 const API_Types::warInfoStructT warInfoStruct = std::get<API_Types::warInfoStructT>(errorCheck(warObj, API_Types::typeOfCheck::WarInfo));
 
                                  warInfoListPtr.get()->append(warInfoStruct);
                              }
@@ -104,14 +101,15 @@ void API_Caller::useWarInfoInfo() {
             myDIH->addWarToCurrentLayout(war);
         }
     }
-    myDIH->setPlanetLayout();
+    myDIH->setWarLayout();
 };
 
 void API_Caller::retrieveWarStatus() {};
 void API_Caller::retrieveMajorOrder() {};
 
-API_Types::warCampaignStructT API_Caller::errorCheck(QJsonObject &info, API_Types::typeOfCheck type)
+std::variant<API_Types::warInfoStructT,API_Types::warCampaignStructT> API_Caller::errorCheck(QJsonObject &info, API_Types::typeOfCheck type)
 {
+    API_Types::warInfoStructT warInfoStruct = API_Types::warInfoStructT();
     API_Types::warCampaignStructT warCampaignStruct = API_Types::warCampaignStructT();
 
     switch(type)
@@ -175,11 +173,10 @@ API_Types::warCampaignStructT API_Caller::errorCheck(QJsonObject &info, API_Type
         } else {
             qDebug() << "Missing or invalid biome object";
         }
+        return warCampaignStruct;
         break;
-    default:
-        qDebug() << "failed to find type in switch case";
+    case API_Types::typeOfCheck::WarInfo:
+        return warInfoStruct;
         break;
-    }
-
-    return warCampaignStruct;
+    };
 };

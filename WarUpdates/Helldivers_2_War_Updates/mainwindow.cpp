@@ -25,7 +25,9 @@ void MainWindow::on_actionClear_all_planets_triggered()
 {
     myDIH->clearPlanetLayout();
     myDIH->clearPlanetsDisplayed();
-    resize(BASE_WIDTH, BASE_HEIGHT);
+    setFixedSize(BASE_WIDTH, BASE_HEIGHT);
+    setMinimumSize(QSize(0, 0));
+    setMaximumSize(MAX_WIDTH, MAX_HEIGHT);
 }
 
 

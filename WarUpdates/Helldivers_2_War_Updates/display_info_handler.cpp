@@ -92,6 +92,11 @@ void DisplayInfoHandler::setPlanetLayout()
     myMainWindow->setCentralWidget(window);
 };
 
+void DisplayInfoHandler::setWarLayout()
+{
+
+};
+
 bool DisplayInfoHandler::getIsWarDisplayed()
 {
     return isWarDisplayed;

@@ -3,6 +3,8 @@
 #include "display_info_handler.h"
 #include <QDebug>
 #include <QApplication>
+#include <QNetworkProxy>
+#include <qnetworkreply.h>
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +18,10 @@ int main(int argc, char *argv[])
 
     w.myApiCaller = std::make_shared<API_Caller>(&w.myDIH);
     qDebug() << "ApiCaller shared";
+
+    w.myApiCaller->netManager->setProxy(QNetworkProxy::NoProxy);
+    QNetworkReply *reply = w.myApiCaller->netManager->get(QNetworkRequest(
+        QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign")));
 
     w.show();
     return a.exec();

@@ -82,8 +82,25 @@ public:
     */
     static void setCurrentLayoutForm(const int& choice);
 
+    /**
+    * @brief adds planet to currenty displayed layout
+    *
+    * @param planet info struct to be added to layout
+    */
     void addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet);
+
+    void addWarLayoutToCurrentLayout(API_Types::warInfoStructT&);
+
+    /**
+    * @brief clears the planet layout
+    */
     void clearPlanetLayout();
+
+    /**
+    * @brief adds pwar to currenty displayed layout
+    *
+    * @param war info struct to be added
+    */
     void addWarToCurrentLayout(API_Types::warInfoStructT& war);
 
     enum CurrentLayoutForm
@@ -93,7 +110,27 @@ public:
     };
     static CurrentLayoutForm layoutForm;
 
+    /**
+    * @brief sets the current planet layout to be used by the main window
+    */
     void setPlanetLayout();
+
+    /**
+    * @brief sets the current war layout to be used by the main window
+    */
+    void setWarLayout();
+
+
+    /*!
+    * @todo next session, will need to look at how i'm handling layouts,
+    * and will program in war layout(probably with modifications to planet
+    * layout)
+    *
+    * also I will need to make my api cals work with callback handlers, otherwise
+    * QEventExec will block signals making my api calls time out
+    */
+
+
 
 private:
     static QSet<int> planetsCurrentlyDisplayed;
