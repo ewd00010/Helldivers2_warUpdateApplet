@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelldivers_Campaign_Updates">
@@ -33,6 +33,9 @@
     <addaction name="separator"/>
     <addaction name="actionClear_all_planets"/>
     <addaction name="actionClear_a_planet"/>
+    <addaction name="separator"/>
+    <addaction name="actionAdd_war_info"/>
+    <addaction name="actionClear_war_info"/>
    </widget>
    <addaction name="menuHelldivers_Campaign_Updates"/>
   </widget>
@@ -55,6 +58,16 @@
   <action name="actionClear_a_planet">
    <property name="text">
     <string>Clear a planet</string>
+   </property>
+  </action>
+  <action name="actionAdd_war_info">
+   <property name="text">
+    <string>Add war info</string>
+   </property>
+  </action>
+  <action name="actionClear_war_info">
+   <property name="text">
+    <string>Clear war info</string>
    </property>
   </action>
  </widget>

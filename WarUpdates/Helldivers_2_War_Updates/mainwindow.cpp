@@ -34,12 +34,19 @@ void MainWindow::on_actionClear_all_planets_triggered()
 void MainWindow::on_action_Automatically_add_triggered()
 {
     myApiCaller->useWarCampaignInfo();
-    qDebug() << "warCampaignInfo";
+    qDebug() << "MainWindow::on_action_Automatically_add_triggered()";
 }
 
 
 void MainWindow::on_action_Manually_add_triggered()
 {
 
+}
+
+
+void MainWindow::on_actionAdd_war_info_triggered()
+{
+    myApiCaller->useWarInfoInfo();
+    qDebug() << "MainWindow::on_actionAdd_war_info_triggered()";
 }
 

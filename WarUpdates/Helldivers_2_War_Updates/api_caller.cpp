@@ -56,11 +56,9 @@ void API_Caller::useWarCampaignInfo() {
             }
         }
     }
-    myDIH->setPlanetLayout();
 }
 
 QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
-    QNetworkAccessManager *netManager = new QNetworkAccessManager();
     QNetworkReply *reply = netManager->get(QNetworkRequest(
         QUrl("https://helldiverstrainingmanual.com/api/v1/war/info")));
     QList<API_Types::warInfoStructT> warInfoList;
@@ -69,21 +67,22 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
 
     QEventLoop myConnectFinished;
     QObject::connect(reply, &QNetworkReply::finished,
-                     [&myConnectFinished, reply, warInfoListPtr, this]() {
+                     [&myConnectFinished, reply, warInfoListPtr, this]()
+                     {
                          if (reply->error() == QNetworkReply::NoError) {
                              QByteArray responseData = reply->readAll();
                              QJsonDocument jsonDoc =
                                  QJsonDocument::fromJson(responseData);
-                             QJsonArray jsonArray = jsonDoc.array();
+                             QJsonObject jsonObject = jsonDoc.object();
 
-                             for (const QJsonValue &war : jsonArray) {
-                                QJsonObject warObj = war.toObject();
+                             const API_Types::warInfoStructT warInfoStruct =
+                                 std::get<API_Types::warInfoStructT>(errorCheck(jsonObject,
+                                    API_Types::typeOfCheck::WarInfo));
 
-                                 const API_Types::warInfoStructT warInfoStruct = std::get<API_Types::warInfoStructT>(errorCheck(warObj, API_Types::typeOfCheck::WarInfo));
-
-                                 warInfoListPtr.get()->append(warInfoStruct);
-                             }
-                         } else {
+                             warInfoListPtr.get()->append(warInfoStruct);
+                         }
+                         else
+                         {
                              qDebug() << "Error:" << reply->errorString();
                          }
                          reply->deleteLater();
@@ -101,7 +100,6 @@ void API_Caller::useWarInfoInfo() {
             myDIH->addWarToCurrentLayout(war);
         }
     }
-    myDIH->setWarLayout();
 };
 
 void API_Caller::retrieveWarStatus() {};
@@ -176,6 +174,20 @@ std::variant<API_Types::warInfoStructT,API_Types::warCampaignStructT> API_Caller
         return warCampaignStruct;
         break;
     case API_Types::typeOfCheck::WarInfo:
+        if (info.contains("warId") && info["warId"].isDouble())
+            warInfoStruct.myWarId = info["warId"].toInt();
+        else
+            qDebug() << "Missing or invalid warId";
+
+        if (info.contains("startDate") && info["endDate"].isDouble())
+            warInfoStruct.myStartDate = info["startDate"].toInt();
+        else
+            qDebug() << "Missing or invalid planet startDate";
+
+        if (info.contains("endDate") && info["endDate"].isDouble())
+            warInfoStruct.myEndDate = info["endDate"].toInt();
+        else
+            qDebug() << "Missing or invalid faction endDate";
         return warInfoStruct;
         break;
     };

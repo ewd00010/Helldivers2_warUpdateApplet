@@ -20,9 +20,13 @@ int main(int argc, char *argv[])
     qDebug() << "ApiCaller shared";
 
     w.myApiCaller->netManager->setProxy(QNetworkProxy::NoProxy);
-    QNetworkReply *reply = w.myApiCaller->netManager->get(QNetworkRequest(
-        QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign")));
 
     w.show();
     return a.exec();
 }
+
+/**
+    next time will need to add more doxygen, add a functionality to clear war info button,
+    and add functionality to adding wars manually (could also make automatic only show planets
+    with progress or more than x players)
+*/

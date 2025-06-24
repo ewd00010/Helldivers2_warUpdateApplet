@@ -6,12 +6,24 @@
 #include "api_caller.h"
 
 
-DisplayInfoHandler::DisplayInfoHandler(QMainWindow *mainWindow) : myMainWindow(mainWindow) {}
+DisplayInfoHandler::DisplayInfoHandler(QMainWindow *mainWindow) : myMainWindow(mainWindow)
+{
+    window = new QWidget;
+
+    mainVLayout = new QVBoxLayout;
+    warLayout = new QHBoxLayout;
+    planetsLayout = new QHBoxLayout;
+    planetsInLayout = new QVector<QGroupBox*>();
+
+    mainVLayout->addLayout(warLayout);
+    mainVLayout->addLayout(planetsLayout);
+
+    window->setLayout(mainVLayout);
+    myMainWindow->setCentralWidget(window);
+}
 
 QSet<int> DisplayInfoHandler::planetsCurrentlyDisplayed;
-
 bool DisplayInfoHandler::isWarDisplayed;
-
 DisplayInfoHandler::CurrentLayoutForm DisplayInfoHandler::layoutForm;
 
 bool DisplayInfoHandler::getIsPlanetDisplayed(const int& planetIndex)
@@ -29,15 +41,12 @@ bool DisplayInfoHandler::setIsPlanetDisplayed(const int& planetIndex)
     return false;
 };
 
-void DisplayInfoHandler::addWarToCurrentLayout(API_Types::warInfoStructT& war){};
-
 void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet)
 {
     if(!getIsPlanetDisplayed(planet.myPlanetIndex))
     {
         setIsPlanetDisplayed(planet.myPlanetIndex);
         QGroupBox* planetGroupBox = new QGroupBox(planet.myPlanetName, window);
-        planetGroupBox->setGeometry(40, 50, 241, 481);
 
         // Create layout for labels
         QVBoxLayout* textLayout = new QVBoxLayout;
@@ -74,27 +83,59 @@ void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT&
         progressBar2->setAlignment(Qt::AlignCenter);
         progressBar2->setInvertedAppearance(true);
 
+        QHBoxLayout* progressBarlayout = new QHBoxLayout;
+        progressBarlayout->addWidget(progressBar1);
+        progressBarlayout->addWidget(progressBar2);
+
         // Layout to organize everything inside QGroupBox
         QVBoxLayout* mainLayout = new QVBoxLayout;
         mainLayout->addWidget(textContainer);
-        mainLayout->addWidget(progressBar1);
-        mainLayout->addWidget(progressBar2);
+        mainLayout->addLayout(progressBarlayout);
 
         planetGroupBox->setLayout(mainLayout);
+        planetsLayout->setSizeConstraint(QLayout::SetMaximumSize);
         planetsLayout->addWidget(planetGroupBox);
         planetsInLayout->append(planetGroupBox);
     }
 };
 
-void DisplayInfoHandler::setPlanetLayout()
+void DisplayInfoHandler::addWarToCurrentLayout(API_Types::warInfoStructT& war)
 {
-    window->setLayout(planetsLayout);
-    myMainWindow->setCentralWidget(window);
-};
+    if(!getIsPlanetDisplayed(war.myWarId))
+    {
+        setIsWarDisplayed();
 
-void DisplayInfoHandler::setWarLayout()
-{
+        QGroupBox* warGroupBox = new QGroupBox("Current War", window);
+        warGroupBox->setFixedSize(QSize(700, 60));
 
+        // Create layout for labels
+        QHBoxLayout* textLayout = new QHBoxLayout;
+        QLabel* warIdLabel = new QLabel("War ID: " + QString::number(war.myWarId));
+
+        QDateTime warStartTime = QDateTime::fromSecsSinceEpoch(war.myStartDate, Qt::UTC);
+        QLabel* warStartLabel = new QLabel("War start: " + warStartTime.toString(Qt::ISODate));
+
+        QDateTime warEndTime = QDateTime::fromSecsSinceEpoch(war.myEndDate, Qt::UTC);
+        QLabel* warEndLabel = new QLabel("War End: " + warEndTime.toString(Qt::ISODate));
+
+        QDateTime warTotalTime = QDateTime::fromSecsSinceEpoch(war.myEndDate - war.myStartDate, Qt::UTC);
+        QLabel* totalTimeLabel = new QLabel("Total WarTime: " + warEndTime.toString(Qt::ISODate));
+
+        textLayout->addStretch(1);
+        textLayout->addWidget(warIdLabel);
+        textLayout->addStretch(1);
+        textLayout->addWidget(warStartLabel);
+        textLayout->addStretch(1);
+        textLayout->addWidget(warEndLabel);
+        textLayout->addStretch(1);
+        textLayout->addWidget(totalTimeLabel);
+
+        warGroupBox->setLayout(textLayout);
+
+        warLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+        warLayout->setSizeConstraint(QLayout::SetMaximumSize);
+        warLayout->addWidget(warGroupBox);
+    }
 };
 
 bool DisplayInfoHandler::getIsWarDisplayed()

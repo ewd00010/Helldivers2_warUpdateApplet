@@ -28,6 +28,8 @@ private slots:
 
     void on_action_Manually_add_triggered();
 
+    void on_actionAdd_war_info_triggered();
+
 private:
     Ui::MainWindow *ui;
     inline static const int BASE_WIDTH = 700;
