@@ -13,7 +13,7 @@
  * @brief Manages what is displayed.
  *
  * @details
- * this class contains information to what is currently display on screen; It
+ * This class contains information to what is currently display on screen; It
  * allows for getting and setting of indivudal planets and wars, append them
  * to the current layout and keeping a log of what is displayed. It also allows
  * for clearing of the current layout.
@@ -23,6 +23,7 @@ class DisplayInfoHandler
 {
 public:
     DisplayInfoHandler(QMainWindow *window);
+    ~DisplayInfoHandler()= default;
 
     /**
     * @brief returns if the planet passed in is displayed
@@ -57,6 +58,18 @@ public:
     static bool clearAPlanetDisplayed(const int& planetIndex);
 
     /**
+    * @brief adds planet to currenty displayed layout
+    *
+    * @param planet info struct to be added to layout
+    */
+    void addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet);
+
+    /**
+    * @brief clears the planet layout
+    */
+    void clearPlanetLayout();
+
+    /**
     * @brief checks if we are displaying war information
     *
     * @return true if the war is displayed currently
@@ -69,32 +82,11 @@ public:
     static void setIsWarDisplayed();
 
     /**
-    * @brief get the current layout form
+    * @brief adds war to currenty displayed layout
     *
-    * @return the layourform we are currently under
+    * @param war info struct to be added to layout
     */
-    static bool getCurrentLayoutForm();
-
-    /**
-    * @brief set the current layout form
-    *
-    * @param the layout form we want to use
-    */
-    static void setCurrentLayoutForm(const int& choice);
-
-    /**
-    * @brief adds planet to currenty displayed layout
-    *
-    * @param planet info struct to be added to layout
-    */
-    void addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet);
-
     void addWarLayoutToCurrentLayout(API_Types::warInfoStructT&);
-
-    /**
-    * @brief clears the planet layout
-    */
-    void clearPlanetLayout();
 
     /**
     * @brief adds pwar to currenty displayed layout
@@ -103,12 +95,10 @@ public:
     */
     void addWarToCurrentLayout(API_Types::warInfoStructT& war);
 
-    enum CurrentLayoutForm
-    {
-        automaticallySet = 0,
-        manuallySet = 1
-    };
-    static CurrentLayoutForm layoutForm;
+    /**
+    * @brief clears the war layout
+    */
+    void clearWarLayout();
 
 private:
     static QSet<int> planetsCurrentlyDisplayed;

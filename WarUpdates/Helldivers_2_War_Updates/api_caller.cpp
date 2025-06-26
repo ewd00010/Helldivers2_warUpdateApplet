@@ -46,6 +46,7 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
 
 void API_Caller::useWarCampaignInfo() {
     qDebug() << "ApiCaller::useWarCampaignInfo";
+
     QList<API_Types::warCampaignStructT> campaignInfo = retrieveWarCampaign();
 
     for (API_Types::warCampaignStructT planet : campaignInfo)
@@ -56,6 +57,7 @@ void API_Caller::useWarCampaignInfo() {
             }
         }
     }
+
 }
 
 QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {

@@ -14,7 +14,6 @@ int main(int argc, char *argv[])
     w.myDIH = std::make_shared<DisplayInfoHandler>(&w);
 
     qDebug() << "DIH shared";
-    w.myDIH.get()->layoutForm = DisplayInfoHandler::CurrentLayoutForm::manuallySet;
 
     w.myApiCaller = std::make_shared<API_Caller>(&w.myDIH);
     qDebug() << "ApiCaller shared";
@@ -26,7 +25,8 @@ int main(int argc, char *argv[])
 }
 
 /**
-    next time will need to add more doxygen, add a functionality to clear war info button,
     and add functionality to adding wars manually (could also make automatic only show planets
-    with progress or more than x players)
+    with progress or more than x players), add some bool that states if anything has changed in
+    layouts since their last automatic call, to use as guard to further calling of the same info,
+    therefore same layout
 */

@@ -1,15 +1,25 @@
 #include "api_types.h"
 #include "display_info_handler.h"
-#include <qnetworkaccessmanager.h>
+#include <QNetworkAccessManager>
 
 #ifndef API_CALLER_H
 #define API_CALLER_H
 
+/**
+ * @class API_Caller
+ * @brief Handles the calling and processing of information from the API.
+ *
+ * @details
+ * This class contains various functions that call the helldivers api and store the information;
+ * The information is then handled by other functions. an instance of network manager is also stored
+ * here.
+ *
+ */
 class API_Caller
 {
 public:
     API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH);
-    virtual ~API_Caller() = default;
+    ~API_Caller() = default;
 
     /**
      * @brief using information from campaign api call

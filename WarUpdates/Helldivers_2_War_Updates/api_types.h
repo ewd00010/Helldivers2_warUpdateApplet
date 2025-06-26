@@ -3,13 +3,27 @@
 
 #pragma once
 
+/**
+ * @class API_Types
+ * @brief Type store for API stuff
+ *
+ * @details
+ * This class contains several structs and enums that contain information for common objects and
+ * states.
+ *
+ *@see api_caller.h
+ */
 class API_Types
 {
 public:
+
+    ~API_Types() = default;
     /**
      * @brief The warCampaignStructT type
      *
      * @details contains information from api call to campaign
+     *
+     * @see API_Caller::retrieveWarCampaign
      */
     struct warCampaignStructT
     {
@@ -29,6 +43,8 @@ public:
      * @brief The warInfoStructT type
      *
      * @details contains information from api call to warInfo
+     *
+     * @see API_Caller::retrieveWarinfo
      */
     struct warInfoStructT
     {

@@ -23,8 +23,7 @@ DisplayInfoHandler::DisplayInfoHandler(QMainWindow *mainWindow) : myMainWindow(m
 }
 
 QSet<int> DisplayInfoHandler::planetsCurrentlyDisplayed;
-bool DisplayInfoHandler::isWarDisplayed;
-DisplayInfoHandler::CurrentLayoutForm DisplayInfoHandler::layoutForm;
+bool DisplayInfoHandler::isWarDisplayed  = false;
 
 bool DisplayInfoHandler::getIsPlanetDisplayed(const int& planetIndex)
 {
@@ -148,23 +147,6 @@ void DisplayInfoHandler::setIsWarDisplayed()
     isWarDisplayed = !isWarDisplayed;
 }
 
-bool DisplayInfoHandler::getCurrentLayoutForm()
-{
-    return layoutForm;
-};
-
-void DisplayInfoHandler::setCurrentLayoutForm(const int& choice)
-{
-    switch(choice)
-    {
-    case 0:
-        layoutForm = CurrentLayoutForm::manuallySet;
-        break;
-    case 1:
-        layoutForm = CurrentLayoutForm::automaticallySet;
-        break;
-    }
-};
 
 void DisplayInfoHandler::clearPlanetsDisplayed()
 {
@@ -184,4 +166,16 @@ void DisplayInfoHandler::clearPlanetLayout()
 
     window->setLayout(planetsLayout);
     myMainWindow->setCentralWidget(window);
+};
+
+void DisplayInfoHandler::clearWarLayout()
+{
+    qDebug() << "DisplayInfoHandler::clearWarLayout";
+    if(isWarDisplayed)
+    {
+        QLayoutItem* warLayoutItem = warLayout->takeAt(0);
+        delete warLayoutItem->widget();
+        delete warLayoutItem;
+        setIsWarDisplayed();
+    }
 };
