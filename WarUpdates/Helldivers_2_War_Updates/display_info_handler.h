@@ -46,7 +46,7 @@ public:
     /**
     * @brief clear ALL planets from the current list of displayed planet ids
     */
-    static void clearPlanetsDisplayed();
+    static void clearAllPlanetsDisplayed();
 
     /**
     * @brief clear A planet from the current list of displayed planet ids
@@ -55,14 +55,14 @@ public:
     *
     * @return true if it is removed from the id list, false if it was not in the list
     */
-    static bool clearAPlanetDisplayed(const int& planetIndex);
+    static bool clearSomePlanetDisplayed(const int planetIndex[]);
 
     /**
     * @brief adds planet to currenty displayed layout
     *
     * @param planet info struct to be added to layout
     */
-    void addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet);
+    void addPlanetToCurrentLayout(API_Types::planetStructT& planet);
 
     /**
     * @brief clears the planet layout

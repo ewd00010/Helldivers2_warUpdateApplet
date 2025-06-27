@@ -8,20 +8,18 @@
 #include <QJsonArray>
 #include <QEventLoop>
 
-API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH) : myDIH(*DIH) {}
+API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH, QObject *parent) : myDIH(*DIH) {}
 
-QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
+void API_Caller::retrieveWarCampaign() {
     QNetworkReply *reply = netManager->get(QNetworkRequest(
         QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign")));
-    QList<API_Types::warCampaignStructT> warCampaignList;
-    auto warCampaignListPtr =
-        std::make_shared<QList<API_Types::warCampaignStructT>>(warCampaignList);
+    warCampaignListPtr = std::make_shared<QList<API_Types::planetStructT>>();
 
     QEventLoop myConnectFinished;
 
     QObject::connect(
-        reply, &QNetworkReply::finished,
-        [&myConnectFinished, reply, &warCampaignListPtr, this]() {
+        reply, &QNetworkReply::finished, this,
+        [&, reply]() {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray responseData = reply->readAll();
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
@@ -29,7 +27,7 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
 
                 for(const QJsonValue &planet : jsonArray) {
                     QJsonObject planetObj = planet.toObject();
-                    API_Types::warCampaignStructT warCampaignStruct = std::get<API_Types::warCampaignStructT>(errorCheck(planetObj, API_Types::typeOfCheck::Campaign));
+                    API_Types::planetStructT warCampaignStruct = std::get<API_Types::planetStructT>(errorCheck(planetObj, API_Types::typeOfCheck::Campaign));
 
                     warCampaignListPtr->append(warCampaignStruct);
                 }
@@ -41,15 +39,12 @@ QList<API_Types::warCampaignStructT> API_Caller::retrieveWarCampaign() {
             myConnectFinished.quit();
         });
     myConnectFinished.exec();
-    return *warCampaignListPtr.get();
 };
 
 void API_Caller::useWarCampaignInfo() {
     qDebug() << "ApiCaller::useWarCampaignInfo";
 
-    QList<API_Types::warCampaignStructT> campaignInfo = retrieveWarCampaign();
-
-    for (API_Types::warCampaignStructT planet : campaignInfo)
+    for (API_Types::planetStructT planet : *warCampaignListPtr)
     {
         if (!DisplayInfoHandler::getIsPlanetDisplayed(planet.myPlanetIndex)) {
             {
@@ -107,10 +102,10 @@ void API_Caller::useWarInfoInfo() {
 void API_Caller::retrieveWarStatus() {};
 void API_Caller::retrieveMajorOrder() {};
 
-std::variant<API_Types::warInfoStructT,API_Types::warCampaignStructT> API_Caller::errorCheck(QJsonObject &info, API_Types::typeOfCheck type)
+std::variant<API_Types::warInfoStructT,API_Types::planetStructT> API_Caller::errorCheck(QJsonObject &info, API_Types::typeOfCheck type)
 {
     API_Types::warInfoStructT warInfoStruct = API_Types::warInfoStructT();
-    API_Types::warCampaignStructT warCampaignStruct = API_Types::warCampaignStructT();
+    API_Types::planetStructT warCampaignStruct = API_Types::planetStructT();
 
     switch(type)
     {

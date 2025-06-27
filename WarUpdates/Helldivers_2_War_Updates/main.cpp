@@ -20,13 +20,26 @@ int main(int argc, char *argv[])
 
     w.myApiCaller->netManager->setProxy(QNetworkProxy::NoProxy);
 
+    w.myApiCaller->retrieveWarCampaign();
+    w.myApiCaller->retrieveWarInfo();
+
+    w.myApiCaller->useWarCampaignInfo();
+    w.myApiCaller->useWarInfoInfo();
+
     w.show();
     return a.exec();
 }
 
 /**
-    and add functionality to adding wars manually (could also make automatic only show planets
-    with progress or more than x players), add some bool that states if anything has changed in
-    layouts since their last automatic call, to use as guard to further calling of the same info,
-    therefore same layout
+    useWarInfoInfo still needs a minor update to store info in a object. easy win.
+
+    need to thread retrieving info for them to be called every 30-300 seconds.
+
+    need to implement selecting amount of planets to show, over the old manually option.
+
+    at somepoint i will make a config file and reader, to allow for tweaking off start up
+    options.
+
+    code also cut down on the total amount of buttons by making them dynamically change
+    function based on state.
 */

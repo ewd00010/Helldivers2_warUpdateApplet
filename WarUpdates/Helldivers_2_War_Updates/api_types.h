@@ -19,13 +19,13 @@ public:
 
     ~API_Types() = default;
     /**
-     * @brief The warCampaignStructT type
+     * @brief The planetStructT type
      *
      * @details contains information from api call to campaign
      *
      * @see API_Caller::retrieveWarCampaign
      */
-    struct warCampaignStructT
+    struct planetStructT
     {
         int myPlanetIndex;
         QString myPlanetName;
@@ -51,31 +51,6 @@ public:
         int myWarId;
         int myStartDate;
         int myEndDate;
-    };
-
-    /**
-     * @brief The planetStatusStructT type
-     *
-     * @details contains information from api call to planetStatus
-     */
-    struct planetStatusStructT
-    {
-        int health;
-        int players;
-        double regenPerSecond;
-    };
-
-    /**
-     * @brief The warStatusStructT type
-     *
-     * @details contains information from api call to warStatus
-     */
-    struct warStatusStructT
-    {
-        int warId;
-        int time;
-        double impactMultiplier;
-        planetStatusStructT myplanetStatusStruct;
     };
 
     /**

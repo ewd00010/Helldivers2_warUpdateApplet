@@ -1,6 +1,7 @@
 #include "api_types.h"
 #include "display_info_handler.h"
-#include <QNetworkAccessManager>
+#include <QtNetwork/QNetworkAccessManager>
+#include <memory>
 
 #ifndef API_CALLER_H
 #define API_CALLER_H
@@ -15,10 +16,10 @@
  * here.
  *
  */
-class API_Caller
+class API_Caller : public QObject
 {
 public:
-    API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH);
+    API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH = nullptr, QObject* parent = nullptr);
     ~API_Caller() = default;
 
     /**
@@ -49,11 +50,10 @@ public:
      *
      * @return a struct with information relevant to the type passed in
      */
-    std::variant<API_Types::warInfoStructT,API_Types::warCampaignStructT> errorCheck(QJsonObject& info, API_Types::typeOfCheck type);
+    std::variant<API_Types::warInfoStructT,API_Types::planetStructT> errorCheck(QJsonObject& info, API_Types::typeOfCheck type);
 
 
     QNetworkAccessManager *netManager = new QNetworkAccessManager();
-private:
 
     /**
      * @brief api call to
@@ -65,7 +65,7 @@ private:
      *
      * @return a struct with error checked war campaign information
      */
-    QList<API_Types::warCampaignStructT> retrieveWarCampaign();
+    void retrieveWarCampaign();
 
     /**
      * @brief api call to
@@ -84,7 +84,7 @@ private:
      * @link https://helldiverstrainingmanual.com/api/v1/war/status
      *
      * @details
-     * calls api to retrieve information, errochecks this informaton and then puts it into a warstatus struct
+     * calls api to retrieve information, errorchecks this informaton and then puts it into a warstatus struct
      * via the use of errorCheck with use of war status type argument
      *
      * @return a struct with error checked war status information
@@ -103,7 +103,11 @@ private:
      */
     void retrieveMajorOrder();
 
+private:
+
     std::shared_ptr<DisplayInfoHandler> myDIH;
+
+    std::shared_ptr<QList<API_Types::planetStructT>> warCampaignListPtr;
 };
 
 #endif // API_CALLER_H

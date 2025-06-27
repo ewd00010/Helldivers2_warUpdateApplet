@@ -26,8 +26,6 @@ private slots:
 
     void on_action_Automatically_add_triggered();
 
-    void on_action_Manually_add_triggered();
-
     void on_actionAdd_war_info_triggered();
 
     void on_actionClear_war_info_triggered();

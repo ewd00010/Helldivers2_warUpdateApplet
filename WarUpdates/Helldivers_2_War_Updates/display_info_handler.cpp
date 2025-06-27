@@ -40,7 +40,7 @@ bool DisplayInfoHandler::setIsPlanetDisplayed(const int& planetIndex)
     return false;
 };
 
-void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::warCampaignStructT& planet)
+void DisplayInfoHandler::addPlanetToCurrentLayout(API_Types::planetStructT& planet)
 {
     if(!getIsPlanetDisplayed(planet.myPlanetIndex))
     {
@@ -148,7 +148,7 @@ void DisplayInfoHandler::setIsWarDisplayed()
 }
 
 
-void DisplayInfoHandler::clearPlanetsDisplayed()
+void DisplayInfoHandler::clearAllPlanetsDisplayed()
 {
     planetsCurrentlyDisplayed.clear();
 };
