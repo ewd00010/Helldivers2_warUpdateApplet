@@ -26,14 +26,18 @@ int main(int argc, char *argv[])
     w.myApiCaller->useWarCampaignInfo();
     w.myApiCaller->useWarInfoInfo();
 
+    std::thread CampaignCallerThread = std::thread(&API_Caller::campaignCallerThreadFunction, w.myApiCaller);
+    CampaignCallerThread.detach();
+
+    std::thread WarInfoCallerThread = std::thread(&API_Caller::warInfoCallerThreadFunction, w.myApiCaller);
+    CampaignCallerThread.detach();
+
     w.show();
     return a.exec();
 }
 
 /**
-    useWarInfoInfo still needs a minor update to store info in a object. easy win.
-
-    need to thread retrieving info for them to be called every 30-300 seconds.
+    will need to convert current std::thread usage, to QThread.
 
     need to implement selecting amount of planets to show, over the old manually option.
 

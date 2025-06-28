@@ -2,6 +2,7 @@
 #include "display_info_handler.h"
 #include <QtNetwork/QNetworkAccessManager>
 #include <memory>
+#include <thread>
 
 #ifndef API_CALLER_H
 #define API_CALLER_H
@@ -77,7 +78,7 @@ public:
      *
      * @return a struct with error checked war info information
      */
-    QList<API_Types::warInfoStructT> retrieveWarInfo();
+    void retrieveWarInfo();
 
     /**
      * @brief api call to
@@ -103,11 +104,23 @@ public:
      */
     void retrieveMajorOrder();
 
+    void campaignCallerThreadFunction();
+    void warInfoCallerThreadFunction();
+
 private:
 
     std::shared_ptr<DisplayInfoHandler> myDIH;
 
     std::shared_ptr<QList<API_Types::planetStructT>> warCampaignListPtr;
+
+    API_Types::warInfoStructT warInfoStruct;
+
+    const QUrl WAR_CAMPAIGN_URL = QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign");
+
+    const QUrl WAR_INFO_URL = QUrl("https://helldiverstrainingmanual.com/api/v1/war/info");
+
+    bool campaignCallerThreadRunning = true;
+    bool warInfoCallerThreadRunning = true;
 };
 
 #endif // API_CALLER_H

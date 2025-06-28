@@ -12,13 +12,12 @@ API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH, QObject *parent
 
 void API_Caller::retrieveWarCampaign() {
     QNetworkReply *reply = netManager->get(QNetworkRequest(
-        QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign")));
+        WAR_CAMPAIGN_URL));
     warCampaignListPtr = std::make_shared<QList<API_Types::planetStructT>>();
 
     QEventLoop myConnectFinished;
 
-    QObject::connect(
-        reply, &QNetworkReply::finished, this,
+    QObject::connect(reply, &QNetworkReply::finished, this,
         [&, reply]() {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray responseData = reply->readAll();
@@ -51,32 +50,34 @@ void API_Caller::useWarCampaignInfo() {
                 myDIH->addPlanetToCurrentLayout(planet);
             }
         }
+    }  
+};
+
+void API_Caller::campaignCallerThreadFunction()
+{
+    while(campaignCallerThreadRunning)
+    {
+        retrieveWarCampaign();
+        std::this_thread::sleep_for(std::chrono::seconds(30));
     }
+};
 
-}
-
-QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
+void API_Caller::retrieveWarInfo() {
     QNetworkReply *reply = netManager->get(QNetworkRequest(
-        QUrl("https://helldiverstrainingmanual.com/api/v1/war/info")));
-    QList<API_Types::warInfoStructT> warInfoList;
-    auto warInfoListPtr =
-        std::make_shared<QList<API_Types::warInfoStructT>>(warInfoList);
+        WAR_INFO_URL));
 
     QEventLoop myConnectFinished;
-    QObject::connect(reply, &QNetworkReply::finished,
-                     [&myConnectFinished, reply, warInfoListPtr, this]()
+    QObject::connect(reply, &QNetworkReply::finished, this,
+                     [&, reply]()
                      {
                          if (reply->error() == QNetworkReply::NoError) {
                              QByteArray responseData = reply->readAll();
-                             QJsonDocument jsonDoc =
-                                 QJsonDocument::fromJson(responseData);
+                             QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
                              QJsonObject jsonObject = jsonDoc.object();
 
-                             const API_Types::warInfoStructT warInfoStruct =
+                            warInfoStruct =
                                  std::get<API_Types::warInfoStructT>(errorCheck(jsonObject,
                                     API_Types::typeOfCheck::WarInfo));
-
-                             warInfoListPtr.get()->append(warInfoStruct);
                          }
                          else
                          {
@@ -86,16 +87,21 @@ QList<API_Types::warInfoStructT> API_Caller::retrieveWarInfo() {
                          myConnectFinished.quit();
                      });
     myConnectFinished.exec();
-    return *warInfoListPtr.get();
 };
 
 void API_Caller::useWarInfoInfo() {
-    QList<API_Types::warInfoStructT> warInfoInfo = retrieveWarInfo();
+    if (!DisplayInfoHandler::getIsWarDisplayed())
+    {
+        myDIH->addWarToCurrentLayout(warInfoStruct);
+    }
+};
 
-    for(API_Types::warInfoStructT& war : warInfoInfo) {
-        if (!DisplayInfoHandler::getIsWarDisplayed()) {
-            myDIH->addWarToCurrentLayout(war);
-        }
+void API_Caller::warInfoCallerThreadFunction()
+{
+    while(warInfoCallerThreadRunning)
+    {
+        retrieveWarInfo();
+        std::this_thread::sleep_for(std::chrono::seconds(30));
     }
 };
 
