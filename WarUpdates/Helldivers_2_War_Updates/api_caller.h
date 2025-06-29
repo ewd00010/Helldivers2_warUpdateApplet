@@ -2,7 +2,6 @@
 #include "display_info_handler.h"
 #include <QtNetwork/QNetworkAccessManager>
 #include <memory>
-#include <thread>
 
 #ifndef API_CALLER_H
 #define API_CALLER_H
@@ -20,7 +19,7 @@
 class API_Caller : public QObject
 {
 public:
-    API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH = nullptr, QObject* parent = nullptr);
+    API_Caller(std::shared_ptr<DisplayInfoHandler> &DIH, QObject* parent = nullptr);
     ~API_Caller() = default;
 
     /**
@@ -54,7 +53,7 @@ public:
     std::variant<API_Types::warInfoStructT,API_Types::planetStructT> errorCheck(QJsonObject& info, API_Types::typeOfCheck type);
 
 
-    QNetworkAccessManager *netManager = new QNetworkAccessManager();
+
 
     /**
      * @brief api call to
@@ -66,7 +65,7 @@ public:
      *
      * @return a struct with error checked war campaign information
      */
-    void retrieveWarCampaign();
+    void retrieveWarCampaign(QNetworkAccessManager &netManager);
 
     /**
      * @brief api call to
@@ -78,7 +77,7 @@ public:
      *
      * @return a struct with error checked war info information
      */
-    void retrieveWarInfo();
+    void retrieveWarInfo(QNetworkAccessManager &netManager);
 
     /**
      * @brief api call to
@@ -104,9 +103,6 @@ public:
      */
     void retrieveMajorOrder();
 
-    void campaignCallerThreadFunction();
-    void warInfoCallerThreadFunction();
-
 private:
 
     std::shared_ptr<DisplayInfoHandler> myDIH;
@@ -118,9 +114,6 @@ private:
     const QUrl WAR_CAMPAIGN_URL = QUrl("https://helldiverstrainingmanual.com/api/v1/war/campaign");
 
     const QUrl WAR_INFO_URL = QUrl("https://helldiverstrainingmanual.com/api/v1/war/info");
-
-    bool campaignCallerThreadRunning = true;
-    bool warInfoCallerThreadRunning = true;
 };
 
 #endif // API_CALLER_H

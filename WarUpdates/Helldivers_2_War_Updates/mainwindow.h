@@ -4,9 +4,11 @@
 #include <QMainWindow>
 #include "display_info_handler.h"
 #include "api_caller.h"
+#include "thread_processes.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 QT_END_NAMESPACE
@@ -20,6 +22,8 @@ public:
     ~MainWindow();
     std::shared_ptr<DisplayInfoHandler> myDIH;
     std::shared_ptr<API_Caller> myApiCaller;
+    std::shared_ptr<Thread_Processes> myThreadProcesses;
+    std::shared_ptr<QThread> CampaignCallerThread;
 
 private slots:
     void on_actionClear_all_planets_triggered();

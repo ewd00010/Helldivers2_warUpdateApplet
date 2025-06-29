@@ -8,62 +8,63 @@
 #include <QJsonArray>
 #include <QEventLoop>
 
-API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> *DIH, QObject *parent) : myDIH(*DIH) {}
+API_Caller::API_Caller(std::shared_ptr<DisplayInfoHandler> &DIH, QObject *parent) : myDIH(DIH) {}
 
-void API_Caller::retrieveWarCampaign() {
-    QNetworkReply *reply = netManager->get(QNetworkRequest(
+void API_Caller::retrieveWarCampaign(QNetworkAccessManager &netManager)
+{
+    QNetworkReply *reply = netManager.get(QNetworkRequest(
         WAR_CAMPAIGN_URL));
     warCampaignListPtr = std::make_shared<QList<API_Types::planetStructT>>();
 
     QEventLoop myConnectFinished;
 
     QObject::connect(reply, &QNetworkReply::finished, this,
-        [&, reply]() {
-            if (reply->error() == QNetworkReply::NoError) {
-                QByteArray responseData = reply->readAll();
-                QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-                QJsonArray jsonArray = jsonDoc.array();
+                     [&, reply]()
+                     {
+                         if (reply->error() == QNetworkReply::NoError)
+        {
+                             QByteArray responseData = reply->readAll();
+                             QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+                             QJsonArray jsonArray = jsonDoc.array();
 
-                for(const QJsonValue &planet : jsonArray) {
-                    QJsonObject planetObj = planet.toObject();
-                    API_Types::planetStructT warCampaignStruct = std::get<API_Types::planetStructT>(errorCheck(planetObj, API_Types::typeOfCheck::Campaign));
+                             for(const QJsonValue &planet : jsonArray) {
+                                 QJsonObject planetObj = planet.toObject();
+                                 API_Types::planetStructT warCampaignStruct = std::get<API_Types::planetStructT>(errorCheck(planetObj, API_Types::typeOfCheck::Campaign));
 
-                    warCampaignListPtr->append(warCampaignStruct);
-                }
-            } else {
-                qDebug() << "Error:" << reply->errorString();
-            }
-            reply->deleteLater();
-            qDebug() << "made it";
-            myConnectFinished.quit();
-        });
+                                 warCampaignListPtr->append(warCampaignStruct);
+                             }
+                         }
+                         else
+                         {
+                             qDebug() << "Error:" << reply->errorString();
+                         }
+                         reply->deleteLater();
+                         qDebug() << "made it";
+                         myConnectFinished.quit();
+                     });
     myConnectFinished.exec();
 };
 
-void API_Caller::useWarCampaignInfo() {
+void API_Caller::useWarCampaignInfo()
+{
     qDebug() << "ApiCaller::useWarCampaignInfo";
 
     for (API_Types::planetStructT planet : *warCampaignListPtr)
     {
-        if (!DisplayInfoHandler::getIsPlanetDisplayed(planet.myPlanetIndex)) {
-            {
-                myDIH->addPlanetToCurrentLayout(planet);
-            }
+        if (!DisplayInfoHandler::getIsPlanetDisplayed(planet.myPlanetIndex))
+        {
+            myDIH->addPlanetToCurrentLayout(planet);
         }
-    }  
-};
-
-void API_Caller::campaignCallerThreadFunction()
-{
-    while(campaignCallerThreadRunning)
-    {
-        retrieveWarCampaign();
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        else
+        {
+            //myDIH->updatePlanetLayout()
+        }
     }
 };
 
-void API_Caller::retrieveWarInfo() {
-    QNetworkReply *reply = netManager->get(QNetworkRequest(
+void API_Caller::retrieveWarInfo(QNetworkAccessManager &netManager)
+{
+    QNetworkReply *reply = netManager.get(QNetworkRequest(
         WAR_INFO_URL));
 
     QEventLoop myConnectFinished;
@@ -75,9 +76,9 @@ void API_Caller::retrieveWarInfo() {
                              QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
                              QJsonObject jsonObject = jsonDoc.object();
 
-                            warInfoStruct =
+                             warInfoStruct =
                                  std::get<API_Types::warInfoStructT>(errorCheck(jsonObject,
-                                    API_Types::typeOfCheck::WarInfo));
+                                                                                API_Types::typeOfCheck::WarInfo));
                          }
                          else
                          {
@@ -89,19 +90,15 @@ void API_Caller::retrieveWarInfo() {
     myConnectFinished.exec();
 };
 
-void API_Caller::useWarInfoInfo() {
+void API_Caller::useWarInfoInfo()
+{
     if (!DisplayInfoHandler::getIsWarDisplayed())
     {
         myDIH->addWarToCurrentLayout(warInfoStruct);
     }
-};
-
-void API_Caller::warInfoCallerThreadFunction()
-{
-    while(warInfoCallerThreadRunning)
+    else
     {
-        retrieveWarInfo();
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        //myDIH->updateWarLayout()
     }
 };
 

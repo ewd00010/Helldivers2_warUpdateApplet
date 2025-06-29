@@ -1,43 +1,65 @@
 #include "mainwindow.h"
 #include "api_caller.h"
 #include "display_info_handler.h"
+#include "thread_processes.h"
 #include <QDebug>
 #include <QApplication>
 #include <QNetworkProxy>
-#include <qnetworkreply.h>
+#include <QNetworkreply>
+#include <QThread>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
     qDebug() << "main window";
-    w.myDIH = std::make_shared<DisplayInfoHandler>(&w);
 
+    w.myDIH = std::make_shared<DisplayInfoHandler>(&w);
     qDebug() << "DIH shared";
 
-    w.myApiCaller = std::make_shared<API_Caller>(&w.myDIH);
+    w.myApiCaller = std::make_shared<API_Caller>(w.myDIH);
     qDebug() << "ApiCaller shared";
 
-    w.myApiCaller->netManager->setProxy(QNetworkProxy::NoProxy);
+    w.myThreadProcesses = std::make_shared<Thread_Processes>();
+    qDebug() << "ThreadProcesses shared";
+    QNetworkAccessManager *netManager = new QNetworkAccessManager;
 
-    w.myApiCaller->retrieveWarCampaign();
-    w.myApiCaller->retrieveWarInfo();
+    w.myApiCaller->retrieveWarCampaign(*netManager);
+    w.myApiCaller->retrieveWarInfo(*netManager);
 
     w.myApiCaller->useWarCampaignInfo();
     w.myApiCaller->useWarInfoInfo();
 
-    std::thread CampaignCallerThread = std::thread(&API_Caller::campaignCallerThreadFunction, w.myApiCaller);
-    CampaignCallerThread.detach();
+    w.CampaignCallerThread = std::make_shared<QThread>();
 
-    std::thread WarInfoCallerThread = std::thread(&API_Caller::warInfoCallerThreadFunction, w.myApiCaller);
-    CampaignCallerThread.detach();
+    w.myThreadProcesses->moveToThread(w.CampaignCallerThread.get());
+
+    Thread_Processes::connect(w.CampaignCallerThread.get(), &QThread::started, [&](){w.myThreadProcesses->warCampaignProcessor(w.myApiCaller);});
+
+    Thread_Processes::connect(w.myThreadProcesses.get(), &Thread_Processes::warCampaignfinished, w.CampaignCallerThread.get(), &QThread::quit);
+
+    w.CampaignCallerThread->start();
+
+    Thread_Processes::connect(w.CampaignCallerThread.get(), &QThread::started, [&](){w.myThreadProcesses->warInfoProcessor(w.myApiCaller);});
+
+    Thread_Processes::connect(w.myThreadProcesses.get(), &Thread_Processes::warInfofinished, w.CampaignCallerThread.get(), &QThread::quit);
+
+    w.CampaignCallerThread->start();
 
     w.show();
     return a.exec();
 }
 
 /**
-    will need to convert current std::thread usage, to QThread.
+    {
+        //myDIH->updatePlanetLayout()
+    }
+
+    {
+        //myDIH->updateWarLayout()
+    }
+
+    will need to do the coding for the functions above.
 
     need to implement selecting amount of planets to show, over the old manually option.
 

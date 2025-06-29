@@ -117,8 +117,12 @@ void DisplayInfoHandler::addWarToCurrentLayout(API_Types::warInfoStructT& war)
         QDateTime warEndTime = QDateTime::fromSecsSinceEpoch(war.myEndDate, Qt::UTC);
         QLabel* warEndLabel = new QLabel("War End: " + warEndTime.toString(Qt::ISODate));
 
-        QDateTime warTotalTime = QDateTime::fromSecsSinceEpoch(war.myEndDate - war.myStartDate, Qt::UTC);
-        QLabel* totalTimeLabel = new QLabel("Total WarTime: " + warEndTime.toString(Qt::ISODate));
+        int totalSecBetween = warStartTime.secsTo(warEndTime);
+        int hours = totalSecBetween/3600;
+        int minutes = (totalSecBetween%3600)/60;
+        int seconds = totalSecBetween%60;
+
+        QLabel* totalTimeLabel = new QLabel("Total WarTime: " + QString("%1h %2m %3s").arg(hours).arg(minutes).arg(seconds));
 
         textLayout->addStretch(1);
         textLayout->addWidget(warIdLabel);

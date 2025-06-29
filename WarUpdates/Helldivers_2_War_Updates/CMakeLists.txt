@@ -28,6 +28,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         api_caller.h api_caller.cpp
         api_types.h
         display_info_handler.h display_info_handler.cpp
+        thread_processes.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Helldivers_2_War_Updates APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
